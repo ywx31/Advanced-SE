@@ -226,14 +226,29 @@ bash scripts/start-mysql.sh
 
 如果仓库克隆到其他位置，请把 `~/Advanced-SE` 替换为实际路径。
 
-此终端需要保持运行。如果本机已有 MySQL 在 `3306` 端口运行，脚本会直接复用。
+此终端需要保持运行。脚本默认使用 `3306`，如果本机已有可登录的 MySQL，会直接复用。
+
+如果 `3306` 已被其他 MySQL 占用但不知道 root 密码，可以改用独立端口；两个终端都要设置相同的环境变量：
+
+```bash
+export MYSQL_PORT=3307
+export MYSQL_SOCKET=/tmp/mathmate-mysql-3307.sock
+```
+
+如果现有 MySQL 的 root 设置了密码，也可以直接提供：
+
+```bash
+export MYSQL_ROOT_USER=root
+export MYSQL_ROOT_PASSWORD='你的本机MySQL密码'
+```
 
 ### 3. 初始化数据库
 
-打开第二个终端，同样进入作业3目录：
+打开第二个终端，同样进入作业3目录并设置相同的 MySQL 参数：
 
 ```bash
 cd ~/Advanced-SE/assignments/assignment-03
+# 如果第一个终端设置了 MYSQL_PORT/MYSQL_SOCKET，这里也要设置相同值
 bash scripts/setup-db.sh
 ```
 

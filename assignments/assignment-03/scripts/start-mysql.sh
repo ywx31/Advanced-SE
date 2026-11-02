@@ -17,16 +17,29 @@ if [[ -z "$MYSQL_BIN" ]]; then
 fi
 MYSQL_HOME="$(cd "$(dirname "$MYSQL_BIN")/.." && pwd)"
 MYSQLADMIN="$MYSQL_HOME/bin/mysqladmin"
-SOCKET="/tmp/mathmate-mysql.sock"
-PORT=3306
+SOCKET="${MYSQL_SOCKET:-/tmp/mathmate-mysql.sock}"
+PORT="${MYSQL_PORT:-3306}"
+ROOT_USER="${MYSQL_ROOT_USER:-root}"
+ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
+ROOT_ARGS=(-u"$ROOT_USER")
+if [[ -n "$ROOT_PASSWORD" ]]; then
+  ROOT_ARGS+=("--password=$ROOT_PASSWORD")
+fi
 
-if "$MYSQLADMIN" --socket="$SOCKET" -uroot ping >/dev/null 2>&1; then
+if "$MYSQLADMIN" --socket="$SOCKET" "${ROOT_ARGS[@]}" status >/dev/null 2>&1; then
   echo "MathMate MySQL 已运行（socket: $SOCKET）。"
   exit 0
 fi
-if "$MYSQLADMIN" -h127.0.0.1 -P"$PORT" -uroot ping >/dev/null 2>&1; then
+if "$MYSQLADMIN" -h127.0.0.1 -P"$PORT" "${ROOT_ARGS[@]}" status >/dev/null 2>&1; then
   echo "端口 $PORT 上已有 MySQL 服务，直接复用。"
   exit 0
+fi
+if nc -z -w 2 127.0.0.1 "$PORT" >/dev/null 2>&1; then
+  echo "端口 $PORT 已被其他 MySQL/服务占用，但当前账号无法连接。"
+  echo "请设置 MYSQL_ROOT_USER/MYSQL_ROOT_PASSWORD，或改用其他端口："
+  echo "  export MYSQL_PORT=3307"
+  echo "  export MYSQL_SOCKET=/tmp/mathmate-mysql-3307.sock"
+  exit 1
 fi
 
 DATA_DIR="$PROJECT_ROOT/.mysql-data6"
@@ -66,7 +79,7 @@ for attempt in 1 2 3 4 5; do
     --pid-file="$RUN_DIR/mysqld.pid" --log-error="$RUN_DIR/mysqld.err" &
   MYSQL_PID=$!
   for _ in $(seq 1 8); do
-    if "$MYSQLADMIN" --socket="$SOCKET" -uroot ping >/dev/null 2>&1; then
+    if "$MYSQLADMIN" --socket="$SOCKET" "${ROOT_ARGS[@]}" status >/dev/null 2>&1; then
       echo "MathMate MySQL 启动成功。"
       wait "$MYSQL_PID"
       exit $?

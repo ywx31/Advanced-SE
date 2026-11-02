@@ -13,6 +13,10 @@ if [[ -z "$MVN_BIN" ]]; then
     exit 1
   fi
 fi
+if [[ "${MYSQL_PORT:-3306}" != "3306" && -z "${DB_URL:-}" ]]; then
+  export DB_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/mathmate?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false"
+fi
+
 if [[ -f "$PROJECT_ROOT/scripts/oss.env" ]]; then
   set -a
   # shellcheck disable=SC1091
