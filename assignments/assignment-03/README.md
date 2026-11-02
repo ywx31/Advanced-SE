@@ -29,10 +29,10 @@ DEEPSEEK_MODEL=deepseek-chat
 ```env
 OSS_ENABLED=false
 OSS_ENDPOINT=填写自己的OSS Endpoint
-OSS_BUCKET=填写自己的Bucket名称
-OSS_ACCESS_KEY_ID=填写自己的AccessKey ID
-OSS_ACCESS_KEY_SECRET=填写自己的AccessKey Secret
-OSS_PUBLIC_BASE_URL=填写自己的Bucket公网地址
+OSS_BUCKET='填写自己的Bucket名称'
+OSS_ACCESS_KEY_ID='填写自己的AccessKey ID'
+OSS_ACCESS_KEY_SECRET='填写自己的AccessKey Secret'
+OSS_PUBLIC_BASE_URL='填写自己的Bucket公网地址'
 ```
 
 `.env` 和 `scripts/oss.env` 已被 `.gitignore` 排除，请勿提交真实密钥。没有配置 DeepSeek 时，周报会自动使用模板回退；没有配置 OSS 时，头像使用本地上传。
@@ -244,11 +244,18 @@ export MYSQL_ROOT_PASSWORD='你的本机MySQL密码'
 
 ### 3. 初始化数据库
 
-打开第二个终端，同样进入作业3目录并设置相同的 MySQL 参数：
+打开第二个终端，同样进入作业3目录：
 
 ```bash
 cd ~/Advanced-SE/assignments/assignment-03
-# 如果第一个终端设置了 MYSQL_PORT/MYSQL_SOCKET，这里也要设置相同值
+bash scripts/setup-db.sh
+```
+
+如果第一个终端使用了独立端口，第二个终端也必须设置相同参数：
+
+```bash
+export MYSQL_PORT=3307
+export MYSQL_SOCKET=/tmp/mathmate-mysql-3307.sock
 bash scripts/setup-db.sh
 ```
 
