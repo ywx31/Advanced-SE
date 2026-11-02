@@ -101,3 +101,11 @@ def test_configured_model_response_is_validated(monkeypatch):
     assert result.model == "deepseek-chat"
     assert result.moderation_status == "PASSED"
     assert "表内除法" in result.summary
+
+
+def test_placeholder_key_is_treated_as_missing(monkeypatch):
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "填写自己密钥")
+    facts = WeeklyFacts.model_validate(facts_payload())
+    result = generate_weekly_narrative(facts)
+    assert result.source == "TEMPLATE"
+    assert result.error_message == "DEEPSEEK_API_KEY 未配置"

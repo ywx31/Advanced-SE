@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from .deepseek_client import generate_weekly_narrative
+from .deepseek_client import configured_api_key, generate_weekly_narrative
 from .schemas import WeeklyFacts, WeeklyNarrativeResponse
 
 load_dotenv()
@@ -25,7 +25,7 @@ def health() -> dict[str, str | bool]:
     return {
         "status": "ok",
         "service": "mathmate-weekly-agent",
-        "deepseekConfigured": bool(os.getenv("DEEPSEEK_API_KEY", "").strip()),
+        "deepseekConfigured": bool(configured_api_key()),
     }
 
 

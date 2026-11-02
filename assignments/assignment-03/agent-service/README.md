@@ -5,7 +5,7 @@
 ## 启动
 
 ```bash
-cd assignments/assignment-03/agent-service
+cd Advanced-SE/assignments/assignment-03/agent-service
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt

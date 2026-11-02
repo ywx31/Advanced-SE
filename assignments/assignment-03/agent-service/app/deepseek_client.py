@@ -12,6 +12,18 @@ from .moderation import moderation_error
 from .schemas import NarrativeContent, WeeklyFacts, WeeklyNarrativeResponse
 
 JSON_FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE)
+PLACEHOLDER_API_KEYS = {
+    "填写自己密钥",
+    "你的Key",
+    "你的DeepSeekKey",
+    "your_key_here",
+    "YOUR_DEEPSEEK_API_KEY",
+}
+
+
+def configured_api_key() -> str:
+    value = os.getenv("DEEPSEEK_API_KEY", "").strip()
+    return "" if value in PLACEHOLDER_API_KEYS else value
 
 
 @dataclass(frozen=True)
@@ -24,7 +36,7 @@ class DeepSeekSettings:
     @classmethod
     def from_env(cls) -> "DeepSeekSettings":
         return cls(
-            api_key=os.getenv("DEEPSEEK_API_KEY", "").strip(),
+            api_key=configured_api_key(),
             base_url=os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com").strip(),
             model=os.getenv("DEEPSEEK_MODEL", "deepseek-chat").strip(),
             timeout_seconds=float(os.getenv("DEEPSEEK_TIMEOUT_SECONDS", "20")),

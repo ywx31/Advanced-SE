@@ -7,12 +7,12 @@
 仓库**不包含任何真实密钥**。首次运行前请按下面步骤创建本地配置：
 
 ```bash
-cd assignments/assignment-03
+cd Advanced-SE/assignments/assignment-03
 
 # DeepSeek Agent 配置
 cp agent-service/.env.example agent-service/.env
 
-# 阿里云 OSS 配置（若需要使用 OSS 头像上传）
+# 阿里云 OSS 配置（可选，仅需要 OSS 头像上传时执行）
 cp scripts/oss.env.example scripts/oss.env
 ```
 
@@ -24,10 +24,10 @@ DEEPSEEK_BASE_URL=https://api.deepseek.com
 DEEPSEEK_MODEL=deepseek-chat
 ```
 
-编辑 `scripts/oss.env`：
+使用 OSS 时编辑 `scripts/oss.env`，填写完成后将 `OSS_ENABLED` 改为 `true`：
 
 ```env
-OSS_ENABLED=true
+OSS_ENABLED=false
 OSS_ENDPOINT=填写自己的OSS Endpoint
 OSS_BUCKET=填写自己的Bucket名称
 OSS_ACCESS_KEY_ID=填写自己的AccessKey ID
@@ -36,6 +36,8 @@ OSS_PUBLIC_BASE_URL=填写自己的Bucket公网地址
 ```
 
 `.env` 和 `scripts/oss.env` 已被 `.gitignore` 排除，请勿提交真实密钥。没有配置 DeepSeek 时，周报会自动使用模板回退；没有配置 OSS 时，头像使用本地上传。
+
+## 项目简介
 
 一个前后端分离的完整四则运算学习产品。支持智能出题、在线答题、自动判题、错题本、学习趋势分析和中文 PDF 练习卷导出。
 
@@ -165,39 +167,73 @@ assignment-03/
 └── docker-compose.yml
 ```
 
+## 快速开始
+
+从 GitHub 克隆后，先进入作业3目录：
+
+```bash
+git clone https://github.com/ywx31/Advanced-SE.git
+cd Advanced-SE/assignments/assignment-03
+```
+
+安装前端依赖：
+
+```bash
+npm install --prefix frontend
+```
+
+后面的命令默认都在 `assignments/assignment-03` 目录执行。
+
 ## 启动方式一：本机 MySQL
 
-### 1. 安装依赖
+### 环境要求
 
-需要 Java 17、Maven、Node.js 18+、MySQL 8+。
+需要 Java 17、Maven、Node.js 18+、MySQL 8+、Python 3.10+。
 
-macOS 如果没有 Maven/MySQL：
+macOS 缺少 Maven 或 MySQL 时：
 
 ```bash
 brew install maven mysql
 ```
 
-前端依赖：
+启动脚本会优先使用 `PATH` 中的 Maven/MySQL，也兼容 IntelliJ IDEA 自带的 Maven。
+
+### 1. 配置 Agent（可选）
 
 ```bash
-cd assignments/assignment-03/frontend
-npm install
+cp agent-service/.env.example agent-service/.env
+bash scripts/setup-agent.sh
 ```
 
-> 本机已经检测到 `/usr/local/mysql/bin/mysqld` 和 IntelliJ 自带 Maven，脚本会自动发现它们，无需额外配置 PATH。
+需要调用 DeepSeek 时，编辑 `agent-service/.env`：
+
+```env
+DEEPSEEK_API_KEY=填写自己密钥
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-chat
+```
+
+保留“填写自己密钥”或留空时，系统会自动使用模板总结，不影响其他功能。
 
 ### 2. 启动 MySQL
 
+打开第一个终端，进入 clone 后的作业3目录：
+
 ```bash
-cd assignments/assignment-03
+cd ~/Advanced-SE/assignments/assignment-03
 bash scripts/start-mysql.sh
 ```
 
-如果本机已经有 MySQL 在 3306 端口运行，脚本会自动复用。
+如果仓库克隆到其他位置，请把 `~/Advanced-SE` 替换为实际路径。
+
+此终端需要保持运行。如果本机已有 MySQL 在 `3306` 端口运行，脚本会直接复用。
 
 ### 3. 初始化数据库
 
+打开第二个终端，同样进入作业3目录：
+
 ```bash
+cd ~/Advanced-SE/assignments/assignment-03
 bash scripts/setup-db.sh
 ```
 
@@ -209,52 +245,39 @@ bash scripts/setup-db.sh
 密码：mathmate
 ```
 
-### 4. 安装并配置周报 Agent（可选）
+### 4. 启动前后端与 Agent
 
-```bash
-cd assignments/assignment-03
-bash scripts/setup-agent.sh
-```
-
-先运行 `cp agent-service/.env.example agent-service/.env`，再编辑 `agent-service/.env`：
-
-```env
-DEEPSEEK_API_KEY=填写自己密钥
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
-```
-
-如果暂不填写 Key，模板回退仍可完整使用周报功能。
-
-### 5. 一键启动前后端与 Agent
+仍在第二个终端执行：
 
 ```bash
 bash scripts/dev.sh
 ```
 
-访问：<http://localhost:5173> 或 <http://127.0.0.1:5173>
+访问：
 
-后端地址：<http://localhost:8080>
+- 前端：<http://localhost:5173>
+- 后端健康检查：<http://localhost:8080/api/health>
+- Agent 健康检查：<http://127.0.0.1:8000/health>
 
-Agent 健康检查：<http://127.0.0.1:8000/health>
+演示账号：
 
-也可以分别启动：
-
-```bash
-cd backend && mvn spring-boot:run
-cd frontend && npm run dev
+```text
+用户名：demo
+密码：demo123
 ```
+
+`Ctrl+C` 可以停止后端、前端和 Agent。
 
 ## 启动方式二：Docker MySQL
 
-如果本机已安装 Docker：
+从仓库根目录进入作业3后启动数据库：
 
 ```bash
-cd assignments/assignment-03
+cd ~/Advanced-SE/assignments/assignment-03
 docker compose up -d
 ```
 
-然后按上面的方式启动后端和前端即可。
+然后继续执行本机启动方式中的“初始化数据库”和“启动前后端与 Agent”步骤。
 
 ## 环境变量
 
@@ -329,32 +352,39 @@ Authorization: Bearer <token>
 
 ## 构建与测试
 
+以下命令均从 `assignments/assignment-03` 目录执行。
+
 前端类型检查和生产构建：
 
 ```bash
-cd assignments/assignment-03/frontend
-npm run build
+npm install --prefix frontend
+npm --prefix frontend run build
 ```
 
 后端测试：
 
 ```bash
-cd assignments/assignment-03/backend
+cd backend
 mvn test
+cd ..
 ```
 
 后端打包：
 
 ```bash
+cd backend
 mvn clean package
 java -jar target/mathmate-backend-1.0.0.jar
+cd ..
 ```
 
 Agent 测试：
 
 ```bash
-cd assignments/assignment-03/agent-service
+bash scripts/setup-agent.sh
+cd agent-service
 .venv/bin/python -m pytest -q
+cd ..
 ```
 
 ## 周报与 Agent 设计
