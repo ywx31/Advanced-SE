@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mathmate.mapper.StatsMapper">
+    <select id="overview" resultType="com.mathmate.dto.stats.OverviewStats">
+        SELECT
+            COUNT(*) AS total_sessions,
+            COALESCE(SUM(total_count), 0) AS total_questions,
+            COALESCE(SUM(correct_count), 0) AS correct_questions,
+            COALESCE(ROUND(SUM(correct_count) / NULLIF(SUM(total_count), 0) * 100, 2), 0) AS average_accuracy,
+            COALESCE(SUM(duration_seconds), 0) AS total_seconds,
+            (SELECT COUNT(*) FROM wrong_questions w WHERE w.user_id = #{userId} AND w.mastered = FALSE) AS active_wrong_questions
+        FROM practice_sessions
+        WHERE user_id = #{userId} AND status = 'SUBMITTED'
+    </select>
+
+    <select id="sessionTrend" resultType="map">
+        SELECT id AS sessionId,
+               DATE_FORMAT(submitted_at, '%m-%d') AS label,
+               accuracy,
+               correct_count AS correctCount,
+               total_count AS totalCount
+        FROM practice_sessions
+        WHERE user_id = #{userId} AND status = 'SUBMITTED'
+        ORDER BY submitted_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="typeAccuracy" resultType="map">
+        SELECT q.question_type AS type,
+               COUNT(*) AS total,
+               SUM(CASE WHEN q.is_correct = TRUE THEN 1 ELSE 0 END) AS correct,
+               ROUND(SUM(CASE WHEN q.is_correct = TRUE THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS accuracy
+        FROM practice_questions q
+        JOIN practice_sessions s ON s.id = q.session_id
+        WHERE s.user_id = #{userId} AND s.status = 'SUBMITTED'
+        GROUP BY q.question_type
+        ORDER BY accuracy ASC
+    </select>
+
+    <select id="dailyStats" resultType="map">
+        SELECT DATE_FORMAT(DATE(submitted_at), '%m-%d') AS date,
+               COUNT(*) AS sessionCount,
+               SUM(total_count) AS questionCount,
+               ROUND(AVG(accuracy), 2) AS accuracy
+        FROM practice_sessions
+        WHERE user_id = #{userId}
+          AND status = 'SUBMITTED'
+          AND submitted_at &gt;= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(DATE(submitted_at), '%m-%d')
+        ORDER BY MIN(submitted_at)
+    </select>
+
+    <select id="activityStats" resultType="map">
+        SELECT DATE(submitted_at) AS practiceDate,
+               COUNT(*) AS sessionCount,
+               SUM(total_count) AS questionCount,
+               ROUND(AVG(accuracy), 2) AS accuracy
+        FROM practice_sessions
+        WHERE user_id = #{userId}
+          AND status = 'SUBMITTED'
+          AND submitted_at &gt;= #{startDate}
+          AND submitted_at &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+        GROUP BY DATE(submitted_at)
+        ORDER BY DATE(submitted_at)
+    </select>
+
+    <select id="submittedDates" resultType="java.time.LocalDate">
+        SELECT DISTINCT DATE(submitted_at)
+        FROM practice_sessions
+        WHERE user_id = #{userId} AND status = 'SUBMITTED'
+        ORDER BY DATE(submitted_at) DESC
+        LIMIT 60
+    </select>
+</mapper>

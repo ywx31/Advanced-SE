@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mathmate.mapper.PracticeQuestionMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO practice_questions(
+            session_id, sort_order, expression, correct_answer, question_type,
+            canonical_key, user_answer, is_correct
+        ) VALUES (
+            #{sessionId}, #{sortOrder}, #{expression}, #{correctAnswer}, #{questionType},
+            #{canonicalKey}, #{userAnswer}, #{correct}
+        )
+    </insert>
+
+    <select id="findBySessionId" resultType="com.mathmate.entity.PracticeQuestion">
+        SELECT id, session_id, sort_order, expression, correct_answer, question_type,
+               canonical_key, user_answer, is_correct AS correct
+        FROM practice_questions
+        WHERE session_id = #{sessionId}
+        ORDER BY sort_order
+    </select>
+
+    <update id="updateAnswer">
+        UPDATE practice_questions
+        SET user_answer = #{userAnswer}, is_correct = #{correct}
+        WHERE id = #{id} AND session_id = #{sessionId}
+    </update>
+</mapper>

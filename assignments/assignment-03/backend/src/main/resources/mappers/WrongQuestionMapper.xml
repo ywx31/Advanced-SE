@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mathmate.mapper.WrongQuestionMapper">
+    <select id="findByUserAndKey" resultType="com.mathmate.entity.WrongQuestion">
+        SELECT id, user_id, canonical_key, expression, question_type, correct_answer, last_wrong_answer,
+               wrong_count, correct_streak, mastered, last_practiced_at, created_at, updated_at
+        FROM wrong_questions
+        WHERE user_id = #{userId} AND canonical_key = #{canonicalKey}
+    </select>
+
+    <select id="findByIdAndUser" resultType="com.mathmate.entity.WrongQuestion">
+        SELECT id, user_id, canonical_key, expression, question_type, correct_answer, last_wrong_answer,
+               wrong_count, correct_streak, mastered, last_practiced_at, created_at, updated_at
+        FROM wrong_questions
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <select id="findByIdsAndUser" resultType="com.mathmate.entity.WrongQuestion">
+        SELECT id, user_id, canonical_key, expression, question_type, correct_answer, last_wrong_answer,
+               wrong_count, correct_streak, mastered, last_practiced_at, created_at, updated_at
+        FROM wrong_questions
+        WHERE user_id = #{userId}
+          AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY wrong_count DESC, last_practiced_at DESC
+    </select>
+
+    <select id="findActiveForPractice" resultType="com.mathmate.entity.WrongQuestion">
+        SELECT id, user_id, canonical_key, expression, question_type, correct_answer, last_wrong_answer,
+               wrong_count, correct_streak, mastered, last_practiced_at, created_at, updated_at
+        FROM wrong_questions
+        WHERE user_id = #{userId} AND mastered = FALSE
+        ORDER BY wrong_count DESC, last_practiced_at DESC
+        LIMIT 100
+    </select>
+
+    <select id="findAllCanonicalKeys" resultType="string">
+        SELECT canonical_key FROM wrong_questions WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO wrong_questions(
+            user_id, canonical_key, expression, question_type, correct_answer, last_wrong_answer,
+            wrong_count, correct_streak, mastered, last_practiced_at
+        ) VALUES (
+            #{userId}, #{canonicalKey}, #{expression}, #{questionType}, #{correctAnswer}, #{lastWrongAnswer},
+            #{wrongCount}, #{correctStreak}, #{mastered}, #{lastPracticedAt}
+        )
+    </insert>
+
+    <update id="updateAfterWrong">
+        UPDATE wrong_questions
+        SET expression = #{expression},
+            question_type = #{questionType},
+            correct_answer = #{correctAnswer},
+            last_wrong_answer = #{lastWrongAnswer},
+            wrong_count = wrong_count + 1,
+            correct_streak = 0,
+            mastered = FALSE,
+            last_practiced_at = #{lastPracticedAt}
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <update id="updateAfterCorrect">
+        UPDATE wrong_questions
+        SET correct_streak = #{correctStreak},
+            mastered = #{mastered},
+            last_practiced_at = #{lastPracticedAt}
+        WHERE id = #{id}
+    </update>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*) FROM wrong_questions
+        WHERE user_id = #{userId}
+        <if test="mastered != null">AND mastered = #{mastered}</if>
+    </select>
+
+    <select id="findPage" resultType="com.mathmate.entity.WrongQuestion">
+        SELECT id, user_id, canonical_key, expression, question_type, correct_answer, last_wrong_answer,
+               wrong_count, correct_streak, mastered, last_practiced_at, created_at, updated_at
+        FROM wrong_questions
+        WHERE user_id = #{userId}
+        <if test="mastered != null">AND mastered = #{mastered}</if>
+        ORDER BY mastered ASC, last_practiced_at DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countActive" resultType="long">
+        SELECT COUNT(*) FROM wrong_questions WHERE user_id = #{userId} AND mastered = FALSE
+    </select>
+
+    <update id="updateMastered">
+        UPDATE wrong_questions SET mastered = #{mastered}
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+</mapper>
