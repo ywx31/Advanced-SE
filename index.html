@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="可定制数量与答案打印方式的四则运算练习卷 PDF 生成器"
+    />
+    <title>四则运算练习卷生成器</title>
+  </head>
+  <body>
+    <div class="page-glow page-glow-left"></div>
+    <div class="page-glow page-glow-right"></div>
+
+    <header class="hero">
+      <div class="brand">
+        <span class="brand-mark">÷</span>
+        <span>
+          <strong>MathSheet</strong>
+          <small>四则运算练习卷生成器</small>
+        </span>
+      </div>
+      <div class="hero-content">
+        <span class="eyebrow">ASSIGNMENT 02 · PDF WORKSHEET</span>
+        <h1>三道数字，两次运算，<br /><em>一键生成练习卷。</em></h1>
+        <p>
+          自定义题目数量与答案打印方式。系统保证每题三个数、两个运算符，
+          结果与中间过程均为 0～100 的整数，并自动排除重复题。
+        </p>
+      </div>
+      <div class="hero-badges">
+        <span>自动去重</span>
+        <span>整数中间结果</span>
+        <span>最多 300 题</span>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="control-card">
+        <div class="card-heading">
+          <div>
+            <span class="section-index">01</span>
+            <h2>定制练习卷</h2>
+            <p>调整数量与打印内容后，可先预览，再下载 PDF。</p>
+          </div>
+          <span class="rule-chip">3 个数 · 2 个运算符</span>
+        </div>
+
+        <div class="control-grid">
+          <div class="field-group">
+            <label for="sheet-title">练习卷名称</label>
+            <input id="sheet-title" class="text-input" maxlength="40" value="四则运算练习卷" />
+          </div>
+
+          <div class="field-group count-group">
+            <div class="label-row">
+              <label for="question-count">题目数量</label>
+              <span id="count-label">300 题</span>
+            </div>
+            <div class="count-controls">
+              <input id="question-count" class="number-input" type="number" min="1" max="300" step="1" value="300" />
+              <input id="question-range" class="range-input" type="range" min="1" max="300" step="1" value="300" />
+            </div>
+            <small>默认 300 题，支持 1～300 道。</small>
+          </div>
+        </div>
+
+        <div class="print-section">
+          <div class="print-heading">
+            <div>
+              <strong>打印方式</strong>
+              <span>选择 PDF 中是否显示每道题的结果。</span>
+            </div>
+            <span class="section-index">02</span>
+          </div>
+          <div class="print-options" role="radiogroup" aria-label="打印方式">
+            <button class="print-option selected" data-mode="blank" type="button" role="radio" aria-checked="true">
+              <span class="option-icon">空</span>
+              <span>
+                <strong>练习题</strong>
+                <small>结果位置留空，适合打印后作答</small>
+              </span>
+              <span class="radio-dot"></span>
+            </button>
+            <button class="print-option" data-mode="answers" type="button" role="radio" aria-checked="false">
+              <span class="option-icon">答</span>
+              <span>
+                <strong>含答案</strong>
+                <small>每题结果直接显示，适合教师核对</small>
+              </span>
+              <span class="radio-dot"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="preview-button" class="button secondary" type="button">
+            <span class="button-icon">↻</span>
+            生成预览
+          </button>
+          <button id="pdf-button" class="button primary" type="button">
+            <span class="button-icon">↓</span>
+            生成并下载 PDF
+          </button>
+        </div>
+        <p class="action-hint">PDF 生成在浏览器本地完成，不会上传题目或个人信息。</p>
+      </section>
+
+      <section class="preview-card">
+        <div class="preview-header">
+          <div>
+            <span class="section-index">03</span>
+            <h2 id="preview-title">练习卷预览</h2>
+            <p id="preview-summary">选择参数后点击“生成预览”。</p>
+          </div>
+          <span id="preview-mode" class="mode-badge">练习题</span>
+        </div>
+
+        <div id="empty-state" class="empty-state">
+          <div class="empty-illustration">
+            <span>1</span><span>+</span><span>2</span><span>×</span><span>3</span>
+          </div>
+          <strong>一张新的练习卷正在等你</strong>
+          <p>点击“生成预览”，这里会展示题目以及最终 PDF 的排版效果。</p>
+        </div>
+
+        <div id="preview-content" class="preview-content hidden">
+          <div class="paper-header">
+            <div>
+              <span class="paper-kicker">MATH WORKSHEET</span>
+              <h3 id="paper-title">四则运算练习卷</h3>
+              <p id="paper-meta">共 300 道题</p>
+            </div>
+            <div class="paper-info">
+              <span>姓名：________________</span>
+              <span>日期：________________</span>
+              <span id="paper-mode">打印方式：练习题</span>
+            </div>
+          </div>
+          <div class="paper-rule">
+            <strong>要求</strong>
+            每题包含三个数、两个运算符；结果及中间过程均为 0～100 的整数。
+          </div>
+          <div id="preview-list" class="question-list"></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="pdf-sheet" class="pdf-sheet">
+      <header class="pdf-header">
+        <div>
+          <span class="pdf-kicker">MATH WORKSHEET · 四则运算</span>
+          <h1 id="pdf-title">四则运算练习卷</h1>
+          <p id="pdf-meta">共 300 道题</p>
+        </div>
+        <div class="pdf-info">
+          <span>姓名：____________________</span>
+          <span>日期：____________________</span>
+          <span id="pdf-mode">打印方式：练习题</span>
+        </div>
+      </header>
+      <div class="pdf-rule">
+        <strong>要求：</strong>每题包含三个数、两个运算符；结果及中间过程均为 0～100 的整数。
+      </div>
+      <div id="pdf-list" class="pdf-list"></div>
+      <footer class="pdf-footer">MathSheet · 自动去重 · 结果范围 0～100</footer>
+    </div>
+
+    <div id="export-overlay" class="export-overlay hidden">
+      <div class="export-box">
+        <span class="loader"></span>
+        <strong>正在生成 PDF</strong>
+        <small id="export-message">正在排版并处理中文字体，请稍候…</small>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
