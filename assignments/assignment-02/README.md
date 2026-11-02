@@ -18,10 +18,16 @@
 
 ![img](Images/img.png)
 
-## 启动
+## 环境要求
+
+- Node.js 18+
+- npm
+
+## 拉取与启动
 
 ```bash
-cd /Users/xyw/assignment2
+git clone https://github.com/ywx31/Advanced-SE.git
+cd Advanced-SE/assignments/assignment-02
 npm install
 npm run dev
 ```
@@ -32,15 +38,12 @@ npm run dev
 http://localhost:5173
 ```
 
-## 测试
+## 测试与构建
+
+在 `assignments/assignment-02` 目录执行：
 
 ```bash
 npm test
-```
-
-## 构建
-
-```bash
 npm run build
 ```
 
@@ -49,7 +52,7 @@ npm run build
 ## 项目结构
 
 ```text
-assignment2/
+assignment-02/
 ├── index.html
 ├── src/
 │   ├── generator.js   题目生成、合法性校验、去重
