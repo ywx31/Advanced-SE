@@ -5,6 +5,10 @@ node_modules/
 dist/
 coverage/
 
+# Keep the published slide deck, but not other build outputs
+!vibe-coding-introduce/dist/
+!vibe-coding-introduce/dist/**
+
 # IDE
 .idea/
 .vscode/
