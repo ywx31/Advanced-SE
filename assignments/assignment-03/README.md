@@ -172,7 +172,7 @@ assignment-03/
 从 GitHub 克隆后，先进入作业3目录：
 
 ```bash
-git clone https://github.com/ywx31/Advanced-SE.git
+git clone https://github.com/yuwen-xiao/Advanced-SE.git
 cd Advanced-SE/assignments/assignment-03
 ```
 

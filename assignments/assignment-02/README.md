@@ -24,7 +24,7 @@
 ## 拉取与启动
 
 ```bash
-git clone https://github.com/ywx31/Advanced-SE.git
+git clone https://github.com/yuwen-xiao/Advanced-SE.git
 cd Advanced-SE/assignments/assignment-02
 npm install
 npm run dev

@@ -35,7 +35,7 @@
 ### 首次克隆
 
 ```bash
-git clone https://github.com/ywx31/Advanced-SE.git
+git clone https://github.com/yuwen-xiao/Advanced-SE.git
 cd Advanced-SE/vibe-coding-introduce
 ```
 
