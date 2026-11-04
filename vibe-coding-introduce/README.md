@@ -1,10 +1,10 @@
 # Vibe Coding Introduce
 
-《Vibe Coding：当自然语言成为编程接口》课程分享材料。本目录与仓库中的 `assignments/` 平行，包含可编辑源文件、网页幻灯片和 PDF 版本。
+《Vibe Coding：当自然语言成为编程接口》课程分享材料，包含可编辑源文件、网页幻灯片和 PDF 版本。
 
 ## 直接阅读
 
-推荐直接下载 PDF 阅读，无需安装任何开发环境：
+**推荐直接下载 PDF 阅读，无需安装任何开发环境**：
 
 - [下载 PDF：vibe-coding.pdf](./vibe-coding.pdf)
 - [网页幻灯片入口：dist/index.html](./dist/index.html)
